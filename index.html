@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ColorWave Studio</title>
+    <style>
+      :root {
+        --bg-dark: #0b1020;
+        --bg-mid: #151d2d;
+        --bg-soft: #1f2940;
+        --card: rgba(255, 255, 255, 0.06);
+        --card-border: rgba(255, 255, 255, 0.12);
+        --text: #edf4ff;
+        --muted: #bdc9e3;
+        --pink: #ff4d9d;
+        --purple: #8a5cff;
+        --blue: #4cc9f0;
+        --green: #4ade80;
+        --yellow: #facc15;
+        --orange: #fb923c;
+        --shadow: 0 20px 45px rgba(12, 17, 30, 0.45);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(138, 92, 255, 0.25), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(76, 201, 240, 0.18), transparent 35%),
+          linear-gradient(180deg, var(--bg-dark), #101827 42%, #111827);
+        color: var(--text);
+        overflow-x: hidden;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      img {
+        display: block;
+        max-width: 100%;
+      }
+
+      .container {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(11, 16, 32, 0.5);
+        backdrop-filter: blur(14px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .nav {
+        min-height: 72px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+      }
+
+      .brand-mark {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, var(--pink), var(--purple), var(--blue));
+        box-shadow: 0 10px 25px rgba(138, 92, 255, 0.45);
+        animation: pulse 2.8s infinite ease-in-out;
+      }
+
+      .brand-mark::before {
+        content: "C";
+        font-weight: 700;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .nav-links a {
+        transition: color 0.2s ease;
+      }
+
+      .nav-links a:hover {
+        color: var(--text);
+      }
+
+      .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .btn {
+        position: relative;
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        border: none;
+        border-radius: 14px;
+        padding: 0.9rem 1.35rem;
+        font-weight: 700;
+        font-size: 0.96rem;
+        cursor: pointer;
+        color: white;
+        letter-spacing: 0.02em;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+        box-shadow: var(--shadow);
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.05);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, var(--pink), var(--purple));
+      }
+
+      .btn-secondary {
+        background: linear-gradient(135deg, var(--blue), var(--green));
+      }
+
+      .btn-accent {
+        background: linear-gradient(135deg, var(--yellow), var(--orange));
+        color: #1b1200;
+      }
+
+      .btn-outline {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        box-shadow: none;
+        color: var(--text);
+      }
+
+      .btn::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,0.28), transparent 80%);
+        transform: translateX(-120%);
+        transition: transform 0.7s ease;
+      }
+
+      .btn:hover::after {
+        transform: translateX(120%);
+      }
+
+      .hero {
+        position: relative;
+        padding: 72px 0 48px;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        align-items: center;
+        gap: 42px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0.5rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: #dfe9ff;
+        margin-bottom: 18px;
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 18px var(--green);
+      }
+
+      h1 {
+        font-size: clamp(2.7rem, 6vw, 5rem);
+        line-height: 0.98;
+        margin: 0 0 18px;
+        letter-spacing: -0.06em;
+      }
+
+      .gradient-text {
+        background: linear-gradient(135deg, #f472b6, #8b5cf6, #67e8f9);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .lead {
+        font-size: 1.08rem;
+        line-height: 1.7;
+        color: var(--muted);
+        max-width: 620px;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin: 30px 0 28px;
+      }
+
+      .mini-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+      }
+
+      .mini-stat {
+        min-width: 120px;
+        padding: 14px 16px;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 16px;
+        background: rgba(255,255,255,0.03);
+      }
+
+      .mini-stat strong {
+        display: block;
+        font-size: 1.5rem;
+        margin-bottom: 3px;
+      }
+
+      .mini-stat span {
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+
+      .visual {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 480px;
+      }
+
+      .device {
+        position: relative;
+        width: min(100%, 420px);
+        aspect-ratio: 0.8;
+        border-radius: 32px;
+        background: linear-gradient(180deg, rgba(17, 24, 39, 0.96), rgba(15, 23, 42, 0.7));
+        border: 1px solid rgba(255,255,255,0.12);
+        box-shadow: 0 30px 80px rgba(14, 19, 36, 0.8);
+        padding: 18px;
+        animation: float 5s ease-in-out infinite;
+      }
+
+      .device::before {
+        content: "";
+        position: absolute;
+        top: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 110px;
+        height: 8px;
+        background: rgba(255,255,255,0.12);
+        border-radius: 999px;
+      }
+
+      .screen {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 24px;
+        overflow: hidden;
+        background: linear-gradient(160deg, rgba(17,24,39,0.7), rgba(10,10,20,0.8));
+        border: 1px solid rgba(255,255,255,0.08);
+      }
+
+      .screen-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 18px 12px;
+      }
+
+      .dots {
+        display: flex;
+        gap: 8px;
+      }
+
+      .dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+      }
+
+      .dot:nth-child(1) { background: #ff5f57; }
+      .dot:nth-child(2) { background: #febc2e; }
+      .dot:nth-child(3) { background: #28c840; }
+
+      .screen-body {
+        padding: 10px 18px 18px;
+      }
+
+      .chart-card {
+        background: linear-gradient(135deg, rgba(138, 92, 255, 0.18), rgba(76, 201, 240, 0.12));
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 22px;
+        padding: 18px;
+        margin-bottom: 16px;
+      }
+
+      .card-label {
+        color: var(--muted);
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .chart-value {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        margin-top: 12px;
+      }
+
+      .numbers {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 700;
+        letter-spacing: -0.05em;
+      }
+
+      .trend {
+        color: var(--green);
+        font-size: 0.8rem;
+        background: rgba(74, 222, 128, 0.12);
+        border: 1px solid rgba(74, 222, 128, 0.2);
+        border-radius: 999px;
+        padding: 0.38rem 0.65rem;
+      }
+
+      .bars {
+        display: flex;
+        align-items: end;
+        gap: 10px;
+        height: 90px;
+        margin-top: 18px;
+      }
+
+      .bars span {
+        flex: 1;
+        border-radius: 10px 10px 0 0;
+        background: linear-gradient(180deg, var(--blue), var(--purple));
+        box-shadow: 0 10px 30px rgba(76, 201, 240, 0.18);
+        animation: rise 1.5s ease;
+      }
+
+      .bars span:nth-child(1) { height: 38%; }
+      .bars span:nth-child(2) { height: 52%; animation-delay: 0.1s; }
+      .bars span:nth-child(3) { height: 68%; animation-delay: 0.2s; }
+      .bars span:nth-child(4) { height: 76%; animation-delay: 0.3s; }
+      .bars span:nth-child(5) { height: 62%; animation-delay: 0.4s; }
+      .bars span:nth-child(6) { height: 88%; animation-delay: 0.5s; }
+
+      .small-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+
+      .mini-box {
+        border-radius: 18px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        padding: 16px;
+      }
+
+      .mini-box .icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-size: 1.2rem;
+        margin-bottom: 14px;
+        background: linear-gradient(135deg, rgba(255,77,157,0.2), rgba(138,92,255,0.2));
+      }
+
+      .mini-box strong {
+        display: block;
+        font-size: 1.2rem;
+        margin-bottom: 4px;
+      }
+
+      .mini-box span {
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+
+      .orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(12px);
+        opacity: 0.7;
+      }
+
+      .orb.one {
+        width: 180px;
+        height: 180px;
+        background: rgba(255, 77, 157, 0.28);
+        top: 12%;
+        left: -4%;
+        animation: drift 11s ease-in-out infinite alternate;
+      }
+
+      .orb.two {
+        width: 220px;
+        height: 220px;
+        background: rgba(76, 201, 240, 0.22);
+        right: -8%;
+        bottom: 12%;
+        animation: drift2 13s ease-in-out infinite alternate;
+      }
+
+      .section {
+        padding: 42px 0;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 24px;
+      }
+
+      .section-header h2 {
+        font-size: clamp(1.9rem, 4vw, 3rem);
+        margin: 0;
+        letter-spacing: -0.05em;
+      }
+
+      .section-header p {
+        margin: 0;
+        color: var(--muted);
+        max-width: 600px;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 22px;
+      }
+
+      .feature-card {
+        background: rgba(255,255,255,0.04);
+        border: 1px solid var(--card-border);
+        border-radius: 24px;
+        padding: 22px;
+        backdrop-filter: blur(8px);
+        box-shadow: var(--shadow);
+        transition: transform 0.25s ease, border-color 0.25s ease;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-6px);
+        border-color: rgba(138, 92, 255, 0.5);
+      }
+
+      .feature-icon {
+        width: 58px;
+        height: 58px;
+        display: grid;
+        place-items: center;
+        border-radius: 18px;
+        font-size: 1.5rem;
+        margin-bottom: 16px;
+        background: linear-gradient(135deg, rgba(255, 77, 157, 0.2), rgba(76, 201, 240, 0.2));
+        border: 1px solid rgba(255,255,255,0.08);
+      }
+
+      .feature-card h3 {
+        margin: 0 0 10px;
+        font-size: 1.24rem;
+      }
+
+      .feature-card p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .cta-banner {
+        padding: 28px;
+        margin-top: 30px;
+        border-radius: 26px;
+        background: linear-gradient(135deg, rgba(255,77,157,0.18), rgba(138,92,255,0.12), rgba(76,201,240,0.1));
+        border: 1px solid rgba(255,255,255,0.08);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        box-shadow: var(--shadow);
+      }
+
+      .cta-banner h3 {
+        margin: 0 0 8px;
+        font-size: clamp(1.5rem, 3vw, 2.2rem);
+        letter-spacing: -0.04em;
+      }
+
+      .cta-banner p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      footer {
+        padding: 28px 0 60px;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(24px);
+        transition: opacity 0.7s ease, transform 0.7s ease;
+      }
+
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      @keyframes pulse {
+        0%, 100% {
+          transform: scale(1);
+          box-shadow: 0 10px 25px rgba(138, 92, 255, 0.45);
+        }
+        50% {
+          transform: scale(1.08);
+          box-shadow: 0 12px 30px rgba(76, 201, 240, 0.38);
+        }
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-12px); }
+      }
+
+      @keyframes rise {
+        0% { transform: scaleY(0.4); opacity: 0.5; }
+        100% { transform: scaleY(1); opacity: 1; }
+      }
+
+      @keyframes drift {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(32px, 18px); }
+      }
+
+      @keyframes drift2 {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(-28px, -18px); }
+      }
+
+      @media (max-width: 860px) {
+        .nav-links {
+          display: none;
+        }
+
+        .hero-grid,
+        .feature-grid,
+        .section-header,
+        .cta-banner {
+          grid-template-columns: 1fr;
+          display: grid;
+        }
+
+        .section-header {
+          align-items: start;
+        }
+
+        .feature-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .cta-banner {
+          justify-content: center;
+          text-align: center;
+        }
+
+        .hero {
+          padding-top: 52px;
+        }
+      }
+
+      @media (max-width: 540px) {
+        .nav {
+          padding: 8px 0;
+        }
+
+        .nav-actions {
+          gap: 8px;
+        }
+
+        .btn {
+          padding: 0.8rem 1rem;
+          font-size: 0.88rem;
+        }
+
+        .mini-stats {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .mini-stat {
+          min-width: 0;
+        }
+
+        .small-cards {
+          grid-template-columns: 1fr;
+        }
+
+        .device {
+          width: min(100%, 360px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container nav">
+        <div class="brand">
+          <div class="brand-mark"></div>
+          <span>ColorWave</span>
+        </div>
+
+        <nav class="nav-links" aria-label="Main navigation">
+          <a href="#features">Features</a>
+          <a href="#studio">Studio</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#contact">Contact</a>
+        </nav>
+
+        <div class="nav-actions">
+          <button class="btn btn-outline" type="button">Log in</button>
+          <button class="btn btn-primary" type="button">Try Free</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="orb one"></div>
+        <div class="orb two"></div>
+
+        <div class="container hero-grid">
+          <div class="content reveal">
+            <div class="eyebrow">Creative growth engine</div>
+            <h1>
+              Make your brand <span class="gradient-text">shine brighter.</span>
+            </h1>
+            <p class="lead">
+              We design colorful digital experiences that turn attention into action.
+              From mobile-first experiences to conversions that feel effortless.
+            </p>
+
+            <div class="cta-row">
+              <button class="btn btn-primary" type="button">Get Started</button>
+              <button class="btn btn-secondary" type="button">Watch Demo</button>
+            </div>
+
+            <div class="mini-stats">
+              <div class="mini-stat">
+                <strong data-count="12">0</strong>
+                <span>Years Design</span>
+              </div>
+              <div class="mini-stat">
+                <strong data-count="96">0</strong>
+                <span>% Satisfaction</span>
+              </div>
+              <div class="mini-stat">
+                <strong data-count="120">0</strong>
+                <span>Projects Launched</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="visual reveal">
+            <div class="device">
+              <div class="screen">
+                <div class="screen-header">
+                  <div class="dots">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                  </div>
+                </div>
+
+                <div class="screen-body">
+                  <div class="chart-card">
+                    <div class="card-label">Performance</div>
+                    <div class="chart-value">
+                      <div class="numbers">+48.6%</div>
+                      <div class="trend">▲ 18.4%</div>
+                    </div>
+                    <div class="bars" aria-label="Chart bars">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                  </div>
+
+                  <div class="small-cards">
+                    <div class="mini-box">
+                      <div class="icon">⚡</div>
+                      <strong>6.2x</strong>
+                      <span>More reach</span>
+                    </div>
+                    <div class="mini-box">
+                      <div class="icon">🎯</div>
+                      <strong>89%</strong>
+                      <span>Engagement</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="features">
+        <div class="container">
+          <div class="section-header reveal">
+            <h2>Why teams choose ColorWave</h2>
+            <p>
+              Built for speed, clarity, and memorable experiences that help your business grow.
+            </p>
+          </div>
+
+          <div class="feature-grid">
+            <article class="feature-card reveal">
+              <div class="feature-icon">🎨</div>
+              <h3>Bold branding</h3>
+              <p>
+                Stand out with vibrant visuals and layouts built to capture attention instantly.
+              </p>
+            </article>
+
+            <article class="feature-card reveal">
+              <div class="feature-icon">📱</div>
+              <h3>Mobile-first design</h3>
+              <p>
+                Seamless user experiences across phones, tablets, and modern desktop displays.
+              </p>
+            </article>
+
+            <article class="feature-card reveal">
+              <div class="feature-icon">🚀</div>
+              <h3>Fast launch</h3>
+              <p>
+                Turn ideas into polished, high-converting experiences with smooth performance.
+              </p>
+            </article>
+          </div>
+
+          <div class="cta-banner reveal">
+            <div>
+              <h3>Ready to build something memorable?</h3>
+              <p>Launch your next idea with a design partner focused on growth.</p>
+            </div>
+            <button class="btn btn-accent" type="button">Book a Call</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer id="contact">
+      © 2026 ColorWave Studio — Designed for bright ideas.
+    </footer>
+
+    <script>
+      // Reveal on scroll
+      const revealItems = document.querySelectorAll('.reveal');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.12 });
+
+      revealItems.forEach((el) => observer.observe(el));
+
+      // Animated counters
+      const counters = document.querySelectorAll('[data-count]');
+      counters.forEach((counter) => {
+        const target = Number(counter.getAttribute('data-count'));
+        let value = 0;
+        const duration = 1500;
+
+        const start = performance.now();
+
+        function updateCount(now) {
+          const progress = Math.min((now - start) / duration, 1);
+          value = Math.floor(progress * target);
+          counter.textContent = value;
+
+          if (progress < 1) {
+            requestAnimationFrame(updateCount);
+          } else {
+            counter.textContent = target;
+          }
+        }
+
+        requestAnimationFrame(updateCount);
+      });
+
+      // Button ripple effect
+      document.querySelectorAll('.btn').forEach((button) => {
+        button.addEventListener('click', function (e) {
+          const ripple = document.createElement('span');
+          const rect = button.getBoundingClientRect();
+          const size = Math.max(rect.width, rect.height);
+          ripple.style.width = ripple.style.height = size + 'px';
+          ripple.style.left = e.clientX - rect.left - size / 2 + 'px';
+          ripple.style.top = e.clientY - rect.top - size / 2 + 'px';
+          ripple.className = 'ripple';
+
+          const existing = button.querySelector('.ripple');
+          if (existing) existing.remove();
+
+          button.appendChild(ripple);
+
+          setTimeout(() => ripple.remove(), 500);
+        });
+      });
+
+      // Ripple CSS
+      const style = document.createElement('style');
+      style.textContent = `
+        .ripple {
+          position: absolute;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.55);
+          transform: scale(0);
+          animation: rippleAnim 0.6s linear;
+          pointer-events: none;
+        }
+
+        @keyframes rippleAnim {
+          to {
+            transform: scale(4);
+            opacity: 0;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    </script>
+  </body>
+</html>
